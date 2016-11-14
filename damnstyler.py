@@ -13,7 +13,7 @@
 # 6 - 
 # 7 - один пробел перед public +
 # 8 - написать функцию поиска парной скобки
-# 9 - 
+# 9*- дописать до опционального настраиваемого скрипта 
 # 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -56,6 +56,13 @@ def findLast(strArg, ch):
   else:
     return (len(strArg) - reverse(strArg).find(ch)-1)
 
+def findLastNonSpacePosBefore(strArg, before):
+  if(type(strArg) != str or type(before) != str):
+    pass  
+  else:
+    lastWord = strArg[:strArg.find(before)].strip().split()[-1]
+    return len(lastWord) + strArg[:strArg.find(before)].rstrip().rfind(lastWord)
+
 calcTabsConst = 4
 namesOfCicles = ["for", "while", "if", "else if"]
 typeOfPrivacy = ["private:", "public:", "protected:"]
@@ -67,7 +74,7 @@ stdLibNames = [" ostream",  "istream", " fstream"," cout ", " cin ", " ofstream"
 for i in range(1, len(sys.argv)):
   print("Parsing file " + (sys.argv[i]).upper() + " ... ")
   inFile = open(sys.argv[i],"rb")
-  stringList = (str(inFile.read().decode("cp1251").encode("utf-8"))).splitlines()
+  stringList = (str(inFile.read())).splitlines() # .decode("WINDOWS-1251").encode("UTF-8")
   inFile.close()
   for k in range(len(stringList)):
     if(stringList[k].startswith("//")):
@@ -107,36 +114,45 @@ for i in range(1, len(sys.argv)):
       blankStrFlag = 1
     else:
       blankStrFlag = 0 
-    
+    #####################################################
     if((stringList[k].lstrip()).startswith("{") and
-           not (stringList[k].lstrip()).endswith("}")):
+          not (stringList[k].lstrip()).endswith("}")):
       stringList[k] = stringList[k].lstrip();
       stringList[k] = strShift(stringList[k], 0, 1)
-      if(reverse(stringList[k-1]).find("//") > 0):
-      	stringList[k-1] = strInsert(stringList[k-1], " {", stringList[k-1].find("//"))
+      if(stringList[k-1].find("//") > 0):
+        insPos = findLastNonSpacePosBefore(stringList[k-1], "//")
+      	stringList[k-1] = stringList[k-1][:insPos] + " {" + stringList[k-1][insPos:]  
       else:
         stringList[k-1] = stringList[k-1].rstrip() + " {"
-      print(str(k) + " BRACES " + stringList[k-1])
-    
+      print(str(k) + " BRACES " + stringList[k-1])		
+    ########################################################
+	
+
     if(stringList[k].find("{") > 0 and stringList[k][stringList[k].find("{")-1] != " "):
       stringList[k] = strInsert(stringList[k], " ", stringList[k].find("{"))
+#linepartition
+    if(stringList[k].lstrip().find("//") > 0):
+      stringList[k] = (stringList[k][:stringList[k].find("//")]).rstrip() + "  // " + (stringList[k][(stringList[k].find("//")+2):]).lstrip()
+    elif(stringList[k].lstrip().find("//") == 0):
+      stringList[k] = "// " + stringList[k].lstrip()[2:].lstrip()
 
-    if(len(stringList[k]) > 80):
+    if(len(stringList[k].rstrip()) > 80):
+      print(str(k) + " NEEDLINEPARTITION WAS" + stringList[k])
       listHalfLen = len(stringList[k].split()) // 2
       stringFormattingSymb = " "
-      if(stringList[k].find("//") == 0):
-        stringList[k] = " " * stringList[k].find(stringList[k].strip()) + stringFormattingSymb.join(stringList[k].split()[:listHalfLen]) + "\n// " + stringFormattingSymb.join(stringList[k].split()[listHalfLen:])
+      if(stringList[k].find("//") > 0):
+        stringList[k] = stringList[k][:stringList[k].find("//")].rstrip() + "\n" + stringList[k][stringList[k].find("//"):].rstrip()
+      elif(stringList[k].find("//") == 0): 
+        stringList[k] = strInsert(stringList[k], "\n// ", len(stringList[k]) // 2 + stringList[k][:len(stringList[k]) // 2].find(" ")).rstrip()
+        stringList[k] = stringList[k][:stringList[k].find("\n")].rstrip() + stringList[k][stringList[k].find("\n"):].lstrip()
       elif(stringList[k].find('"') < stringList[k].find(stringList[k].split()[listHalfLen]) and
-          (stringList[k].find(stringList[k].split()[listHalfLen]) < len(stringList[k]) - reverse(stringList[k]).find('"'))):
+          (stringList[k].find(stringList[k].split()[listHalfLen])+len(stringList[k].split()[listHalfLen]) < stringList[k][:stringList[k].find("//")].rfind('"'))):
         stringList[k] = " " * stringList[k].find(stringList[k].strip()) + stringFormattingSymb.join(stringList[k].split()[:listHalfLen]) + '"\n' + " " * stringList[k].find('"') + '"' + stringFormattingSymb.join(stringList[k].split()[listHalfLen:])
       else:
         stringList[k] = " " * stringList[k].find(stringList[k].strip()) + stringFormattingSymb.join(stringList[k].split()[:listHalfLen]) + "\n" + stringFormattingSymb.join(stringList[k].split()[listHalfLen:])
       print(str(k) + " NEEDLINEPARTITION " + stringList[k])
 
-    if(stringList[k].lstrip().find("//") > 0):
-      stringList[k] = (stringList[k][:stringList[k].find("//")]).rstrip() + "  // " + (stringList[k][(stringList[k].find("//")+2):]).lstrip()
-    elif(stringList[k].lstrip().find("//") == 0):
-      stringList[k] = "// " + stringList[k].lstrip()[2:].lstrip()
+    
 
     ##if(stringList[k].lstrip().startswith("}")):
     ##  stringList[k] = stringList[k] + "\n\n"
@@ -163,7 +179,7 @@ for i in range(1, len(sys.argv)):
 
   for k in stringList:
     if(len(k.strip()) > 0):
-      outFile.write((k.rstrip() + "\n").decode("utf-8").encode("cp1251")) 
+      outFile.write((k.rstrip() + "\n").decode("utf-8").encode("utf-8"))
   outFile.close()
 
 
