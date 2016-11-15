@@ -105,15 +105,15 @@ for i in range(1, len(sys.argv)):
       if(stringList[k].lstrip().startswith(privacyName)):
         stringList[k] = " " + privacyName + stringList[k].lstrip()[len(privacyName):]
         print(str(k) + ": PRIVACY " + stringList[k])
-        if(blankStrFlag == 0): 
+        if(stringList[k-2].lstrip().find("class") < 0): 
           stringList[k] = "\n" + stringList[k]
         else:
           stringList[k-1] = stringList[k-1][:len(stringList[k])-1] 
     
-    if(stringList[k-1].lstrip().startswith("class ")):
-      blankStrFlag = 1
-    else:
-      blankStrFlag = 0 
+    #if(stringList[k-1].lstrip().startswith("class ")):
+    #  blankStrFlag = 1
+    #else:
+    #  blankStrFlag = 0 
     #####################################################
     if((stringList[k].lstrip()).startswith("{") and
           not (stringList[k].lstrip()).endswith("}")):
@@ -131,13 +131,14 @@ for i in range(1, len(sys.argv)):
     if(stringList[k].find("{") > 0 and stringList[k][stringList[k].find("{")-1] != " "):
       stringList[k] = strInsert(stringList[k], " ", stringList[k].find("{"))
 #linepartition
-    if(stringList[k].lstrip().find("//") > 0):
-      stringList[k] = (stringList[k][:stringList[k].find("//")]).rstrip() + "  // " + (stringList[k][(stringList[k].find("//")+2):]).lstrip()
-    elif(stringList[k].lstrip().find("//") == 0):
-      stringList[k] = "// " + stringList[k].lstrip()[2:].lstrip()
+    
 
     if(len(stringList[k].rstrip()) > 80):
       print(str(k) + ": NEEDLINEPARTITION WAS" + stringList[k])
+      if(stringList[k].lstrip().find("//") > 0):
+        stringList[k] = (stringList[k][:stringList[k].find("//")]).rstrip() + "  // " + (stringList[k][(stringList[k].find("//")+2):]).lstrip()
+      elif(stringList[k].lstrip().find("//") == 0):
+        stringList[k] = "// " + stringList[k].lstrip()[2:].lstrip()
       listHalfLen = len(stringList[k].split()) // 2
       stringFormattingSymb = " "
       if(stringList[k].find("//") > 0):
@@ -146,9 +147,9 @@ for i in range(1, len(sys.argv)):
           print(str(k) + ": WANTED TO INSERT SPACES")
         else:
           stringList[k] = stringList[k][:stringList[k].find("//")].rstrip() + "\n" + stringList[k][stringList[k].find("//"):].rstrip()
-      elif(stringList[k].find("//") == 0): 
+      elif(stringList[k].lstrip().find("//") == 0): 
         stringList[k] = strInsert(stringList[k], "\n// ", len(stringList[k]) // 2 + stringList[k][:len(stringList[k]) // 2].find(" ")).rstrip()
-        stringList[k] = stringList[k][:stringList[k].find("\n")].rstrip() + stringList[k][stringList[k].find("\n"):].lstrip()
+        stringList[k] = stringList[k][:stringList[k].find("\n")].rstrip() + "\n" +stringList[k][stringList[k].find("\n"):].lstrip()
       elif(stringList[k].find('"') < stringList[k].find(stringList[k].split()[listHalfLen]) and
           (stringList[k].find(stringList[k].split()[listHalfLen])+len(stringList[k].split()[listHalfLen]) < stringList[k][:stringList[k].find("//")].rfind('"'))):
         stringList[k] = " " * stringList[k].find(stringList[k].strip()) + stringFormattingSymb.join(stringList[k].split()[:listHalfLen]) + '"\n' + " " * stringList[k].find('"') + '"' + stringFormattingSymb.join(stringList[k].split()[listHalfLen:])
