@@ -68,7 +68,7 @@ namesOfCicles = ["for", "while", "if", "else if"]
 typeOfPrivacy = ["private:", "public:", "protected:"]
 blankStrFlag = 0
 
-stdLibNames = [" ostream",  "istream", " fstream"," cout ", " cin ", " ofstream", "ifstream", " fstream", " endl", "queue<", "stack<", "vector<" ]
+stdLibNames = ["ostream",  "istream", "fstream"," cout ", " cin ", "ofstream", "ifstream", "fstream", " endl", "queue<", "stack<", "vector<" , "list<", "map<", "hash<", "deque<", "set<", "multiset<", "multimap<", "bitset<", "priority_queue<", "complex<"]
 
 # --главная_первый_проход-- {
 for i in range(1, len(sys.argv)):
