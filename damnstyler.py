@@ -63,7 +63,7 @@ def findLastNonSpacePosBefore(strArg, before):
     lastWord = strArg[:strArg.find(before)].strip().split()[-1]
     return len(lastWord) + strArg[:strArg.find(before)].rstrip().rfind(lastWord)
 
-calcTabsConst = 4
+calcTabsConst = 2
 namesOfCicles = ["for", "while", "if", "else if"]
 typeOfPrivacy = ["private:", "public:", "protected:"]
 blankStrFlag = 0
@@ -78,7 +78,7 @@ for i in range(1, len(sys.argv)):
   inFile.close()
   for k in range(len(stringList)):
     if(stringList[k].startswith("//")):
-      print(str(k) + " COMMENT " + stringList[k])
+      print(str(k) + ": COMMENT " + stringList[k])
 
     if(stringList[k].startswith("#include")):
       continue
@@ -87,24 +87,24 @@ for i in range(1, len(sys.argv)):
           len(stringList[k].split()) == 2):
       stringList[k] = stringList[k].split()[0] + " " + genIncludeConst(sys.argv[i])
       continue
-      print(str(k) + " DEFINES " + stringList[k])
+      print(str(k) + ": DEFINES " + stringList[k])
     elif(stringList[k].startswith("#endif")):
       stringList[k] = stringList[k].split()[0] + "  // " + genIncludeConst(sys.argv[i])
-      print(str(k) + " ENDDEFS " + stringList[k])
+      print(str(k) + ": ENDDEFS " + stringList[k])
 
     while(stringList[k].startswith("\t")):
       stringList[k] = stringList[k].expandtabs(calcTabsConst)
-      print(str(k) + " TABULAT " + stringList[k])
+      print(str(k) + ": TABULAT " + stringList[k])
     
     for cicleName in namesOfCicles:
       if(stringList[k].find(cicleName) >= 0 and stringList[k][stringList[k].find(cicleName)+len(cicleName)] != " "):
         stringList[k] = strInsert(stringList[k], " ", stringList[k].find(cicleName) + len(cicleName)) 
-        print(str(k) + " CONDSTATE " + stringList[k])  
+        print(str(k) + ": CONDSTATE " + stringList[k])  
     
     for privacyName in typeOfPrivacy:
       if(stringList[k].lstrip().startswith(privacyName)):
         stringList[k] = " " + privacyName + stringList[k].lstrip()[len(privacyName):]
-        print(str(k) + " PRIVACY " + stringList[k])
+        print(str(k) + ": PRIVACY " + stringList[k])
         if(blankStrFlag == 0): 
           stringList[k] = "\n" + stringList[k]
         else:
@@ -124,7 +124,7 @@ for i in range(1, len(sys.argv)):
       	stringList[k-1] = stringList[k-1][:insPos] + " {" + stringList[k-1][insPos:]  
       else:
         stringList[k-1] = stringList[k-1].rstrip() + " {"
-      print(str(k) + " BRACES " + stringList[k-1])		
+      print(str(k) + ": BRACES " + stringList[k-1])		
     ########################################################
 	
 
@@ -137,11 +137,15 @@ for i in range(1, len(sys.argv)):
       stringList[k] = "// " + stringList[k].lstrip()[2:].lstrip()
 
     if(len(stringList[k].rstrip()) > 80):
-      print(str(k) + " NEEDLINEPARTITION WAS" + stringList[k])
+      print(str(k) + ": NEEDLINEPARTITION WAS" + stringList[k])
       listHalfLen = len(stringList[k].split()) // 2
       stringFormattingSymb = " "
       if(stringList[k].find("//") > 0):
-        stringList[k] = stringList[k][:stringList[k].find("//")].rstrip() + "\n" + stringList[k][stringList[k].find("//"):].rstrip()
+        if(k > 0):
+          stringList[k] = stringList[k][:stringList[k].find("//")].rstrip() + "\n" + " " * stringList[k-1].find(stringList[k-1].lstrip())+ stringList[k][stringList[k].find("//"):].rstrip()
+          print(str(k) + ": WANTED TO INSERT SPACES")
+        else:
+          stringList[k] = stringList[k][:stringList[k].find("//")].rstrip() + "\n" + stringList[k][stringList[k].find("//"):].rstrip()
       elif(stringList[k].find("//") == 0): 
         stringList[k] = strInsert(stringList[k], "\n// ", len(stringList[k]) // 2 + stringList[k][:len(stringList[k]) // 2].find(" ")).rstrip()
         stringList[k] = stringList[k][:stringList[k].find("\n")].rstrip() + stringList[k][stringList[k].find("\n"):].lstrip()
@@ -150,7 +154,7 @@ for i in range(1, len(sys.argv)):
         stringList[k] = " " * stringList[k].find(stringList[k].strip()) + stringFormattingSymb.join(stringList[k].split()[:listHalfLen]) + '"\n' + " " * stringList[k].find('"') + '"' + stringFormattingSymb.join(stringList[k].split()[listHalfLen:])
       else:
         stringList[k] = " " * stringList[k].find(stringList[k].strip()) + stringFormattingSymb.join(stringList[k].split()[:listHalfLen]) + "\n" + stringFormattingSymb.join(stringList[k].split()[listHalfLen:])
-      print(str(k) + " NEEDLINEPARTITION " + stringList[k])
+      print(str(k) + ": NEEDLINEPARTITION " + stringList[k])
 
     
 
@@ -181,5 +185,5 @@ for i in range(1, len(sys.argv)):
     if(len(k.strip()) > 0):
       outFile.write((k.rstrip() + "\n").decode("utf-8").encode("utf-8"))
   outFile.close()
-
+  print("Parsing of " + sys.argv[i].upper() + " DONE.......")
 
