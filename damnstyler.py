@@ -64,7 +64,7 @@ def findLastNonSpacePosBefore(strArg, before):
     return len(lastWord) + strArg[:strArg.find(before)].rstrip().rfind(lastWord)
 
 calcTabsConst = 2
-namesOfCicles = ["for", "while", "if", "else if"]
+namesOfCicles = ["for", "while", "if", "else if", "switch", "case"]
 typeOfPrivacy = ["private:", "public:", "protected:"]
 blankStrFlag = 0
 
@@ -97,7 +97,7 @@ for i in range(1, len(sys.argv)):
       print(str(k) + ": TABULAT " + stringList[k])
     
     for cicleName in namesOfCicles:
-      if(stringList[k].find(cicleName) >= 0 and stringList[k][stringList[k].find(cicleName)+len(cicleName)] != " "):
+      if(stringList[k].find(cicleName) >= 0 and not stringList[k][stringList[k].find(cicleName)+len(cicleName)].isalnum() and stringList[k][stringList[k].find(cicleName)+len(cicleName)] != " "):
         stringList[k] = strInsert(stringList[k], " ", stringList[k].find(cicleName) + len(cicleName)) 
         print(str(k) + ": CONDSTATE " + stringList[k])  
     
